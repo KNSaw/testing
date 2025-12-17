@@ -1,4 +1,3 @@
-ini contoh cara pake di streamlit nya
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
