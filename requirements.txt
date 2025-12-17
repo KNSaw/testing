@@ -1,8 +1,8 @@
-transformers==4.32.2
-tokenizers==0.13.2
-torch>=2.1
-peft>=0.6.0
-streamlit>=1.25
+transformers
+tokenizers
+torch
+peft
+streamlit
 huggingface_hub
 sentencepiece
 
