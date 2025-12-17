@@ -9,7 +9,7 @@ tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 
 base_model = AutoModelForCausalLM.from_pretrained(
     BASE_MODEL,
-    dtype=torch.float166,
+    dtype=torch.float16,
     device_map="auto"
 )
 
