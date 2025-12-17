@@ -3,7 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from peft import PeftModel
 
-BASE_MODEL = "microsoft/Phi-3-mini-4k-instruct"
+BASE_MODEL = "microsoft/Phi-3-mini-instruct"
 ADAPTER = "./gemma2b_lora_adapter"
 
 class LLMClient:
@@ -12,7 +12,7 @@ class LLMClient:
         base_model = AutoModelForCausalLM.from_pretrained(
             BASE_MODEL,
             dtype=torch.float16,
-            device_map="auto"
+            device_map="cpu"
         )
 
         self.model = PeftModel.from_pretrained(base_model, ADAPTER)
