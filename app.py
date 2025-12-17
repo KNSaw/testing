@@ -1,34 +1,50 @@
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-
+# ---------------- CONFIG ----------------
 BASE_MODEL = "unsloth/gemma-2-2b-it"
 ADAPTER = "./gemma2b_lora_adapter"
+MAX_TURNS = 3  # jumlah turn chat yang disertakan di history
+
+# ---------------- LLM Client ----------------
+@st.cache_resource(show_spinner=True)
+def load_llm():
+    st.info("Loading tokenizer and base model...")
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+
+    base_model = AutoModelForCausalLM.from_pretrained(
+        BASE_MODEL,
+        torch_dtype=torch.float16,
+        device_map="auto"  # otomatis ke GPU jika ada, else CPU
+    )
+
+    st.info("Applying LoRA adapter...")
+    model = PeftModel.from_pretrained(base_model, ADAPTER)
+    model.eval()
+
+    if torch.cuda.is_available():
+        model.cuda()
+
+    return tokenizer, model
 
 class LLMClient:
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-        base_model = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL,
-            dtype=torch.float16,
-            device_map="cpu"
-        )
-
-        self.model = PeftModel.from_pretrained(base_model, ADAPTER)
-        self.model.eval()
+        self.tokenizer, self.model = load_llm()
 
     def ask(self, prompt, max_tokens=128, temperature=0.0):
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
-        out = self.model.generate(**inputs, max_new_tokens=max_tokens)
+        with torch.no_grad():
+            out = self.model.generate(
+                **inputs,
+                max_new_tokens=max_tokens,
+                temperature=temperature,
+                do_sample=True if temperature > 0 else False
+            )
         return self.tokenizer.decode(out[0], skip_special_tokens=True)
 
-# ----------------- Streamlit UI -----------------
-st.set_page_config(page_title="Chatbot PMB UAJY")
-
-llm = LLMClient()
-
+# ---------------- Prompt Formatter ----------------
 def format_prompt(question, history=""):
     return f"""### Category: PMB_Umum
 ### Instruction:
@@ -41,25 +57,30 @@ Jawablah pertanyaan berikut berdasarkan informasi resmi PMB Universitas Atma Jay
 ### Response:
 """.strip()
 
+# ---------------- Streamlit UI ----------------
+st.set_page_config(page_title="Chatbot PMB UAJY", layout="wide")
 st.title("🎓 Chatbot PMB UAJY")
-st.caption("Chatbot berbasis LLM dengan LoRA adapter")
+st.caption("Chatbot berbasis LLM Gemma-2-2B + LoRA adapter")
 
+# session state untuk menyimpan chat
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Tampilkan riwayat chat
+llm = LLMClient()
+
+# tampilkan riwayat chat
 for role, content in st.session_state.messages:
     with st.chat_message(role):
         st.markdown(content)
 
+# input user
 user_input = st.chat_input("Tanyakan seputar PMB UAJY...")
 
 if user_input:
     st.session_state.messages.append(("user", user_input))
 
-    # Ambil history terakhir
+    # ambil history terakhir
     history_text = ""
-    MAX_TURNS = 3
     for role, msg in st.session_state.messages[-2*MAX_TURNS:-1]:
         history_text += f"{role.capitalize()}: {msg}\n"
 
