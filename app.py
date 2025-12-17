@@ -3,6 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from peft import PeftModel
 
+
 BASE_MODEL = "unsloth/gemma-2-2b-it"
 ADAPTER = "./gemma2b_lora_adapter"
 
