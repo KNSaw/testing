@@ -3,7 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from peft import PeftModel
 
-BASE_MODEL = "microsoft/Phi-3-mini-instruct"
+BASE_MODEL = "mosaicml/mpt-7b-chat"
 ADAPTER = "./gemma2b_lora_adapter"
 
 class LLMClient:
