@@ -3,8 +3,9 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-BASE_MODEL = "unsloth/gemma-2-2b-it"
-ADAPTER = "diordty/gemma2b-lora-pmb-uajy"
+BASE_MODEL = "microsoft/Phi-3-mini-4k-instruct"
+ADAPTER = "./gemma2b_lora_adapter" 
+
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 
