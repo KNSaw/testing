@@ -3,7 +3,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from peft import PeftModel
 
-BASE_MODEL = "mosaicml/mpt-7b-chat"
+BASE_MODEL = "microsoft/DialoGPT-small"
 ADAPTER = "./gemma2b_lora_adapter"
 
 class LLMClient:
