@@ -1,6 +1,6 @@
-torch==2.1.0
 transformers
-streamlit==1.52.1
-peft==0.6.0
+streamlit
+peft
 sentencepiece
 huggingface_hub
+torch
