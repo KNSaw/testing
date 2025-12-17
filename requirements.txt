@@ -1,7 +1,9 @@
+transformers==4.32.2
+tokenizers==0.13.2
 torch>=2.1
-transformers==4.33.2
 peft>=0.6.0
 streamlit>=1.25
 huggingface_hub
 sentencepiece
+
 
